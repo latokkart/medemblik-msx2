@@ -1,0 +1,38 @@
+name: Assemble Medemblik ROM
+on:
+  push:
+    paths:
+      - 'dist/zlib_b64/**'
+      - '.github/workflows/assemble-rom.yml'
+  workflow_dispatch:
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inflate ROM from zlib_b64 parts
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib, zlib, base64
+          parts = sorted(pathlib.Path('dist/zlib_b64').glob('*.txt'))
+          assert parts, 'no parts'
+          b64 = ''.join(p.read_text().strip() for p in parts)
+          raw = zlib.decompress(base64.b64decode(b64))
+          assert len(raw) == 524288, len(raw)
+          pathlib.Path('dist/medemblik.rom').write_bytes(raw)
+          print('parts', len(parts), 'wrote', len(raw))
+          PY
+      - name: Commit ROM if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist/medemblik.rom
+          if git diff --staged --quiet; then
+            echo "No ROM changes"
+          else
+            git commit -m "Add Screen 7 ASCII16 Medemblik ROM (512KB)"
+            git push
+          fi
