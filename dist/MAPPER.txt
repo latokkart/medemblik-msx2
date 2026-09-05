@@ -1,0 +1,7 @@
+ASCII16 Screen7
+Banks: 32 x 16384 = 524288 bytes (512KB, pad 0xFF)
+Switch: 6000h = page 4000h, 7000h = page 8000h
+Bank 0 = code+font+names+name_grid; banks 1..16 = map (32 lines x 512 BPL); banks 17..31 = empty 0xFF
+Screen 7 view 512x212; world 1024x512
+VRAM: SETWR2 (R#14) only — no BIOS SETWRT/WRTVRM
+Names: 80 streets; grid 128x64 cells
