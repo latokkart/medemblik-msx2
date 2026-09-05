@@ -16,14 +16,20 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import pathlib, zlib, base64
+          import pathlib, zlib, base64, hashlib
           parts = sorted(pathlib.Path('dist/zlib_b64').glob('*.txt'))
-          assert parts, 'no parts'
+          assert len(parts) == 6, parts
           b64 = ''.join(p.read_text().strip() for p in parts)
+          # Fix known single-char MCP transcription errors in parts 02/03
+          b64 = b64.replace('AcWIh3rCj32PnQf', 'AcWIh3rCJ32PnQf', 1)
+          b64 = b64.replace('Sd66rc3KaRpqPTTc', 'Sd66rc3KaRqdPTTc', 1)
           raw = zlib.decompress(base64.b64decode(b64))
           assert len(raw) == 524288, len(raw)
+          expect = '0271b2649d10853604f1c868366e894bbe987b123dc5858f3b0878c561e6a12d'
+          got = hashlib.sha256(raw).hexdigest()
+          assert got == expect, got
           pathlib.Path('dist/medemblik.rom').write_bytes(raw)
-          print('parts', len(parts), 'wrote', len(raw))
+          print('parts', len(parts), 'wrote', len(raw), 'sha256', got)
           PY
       - name: Commit ROM if changed
         run: |
