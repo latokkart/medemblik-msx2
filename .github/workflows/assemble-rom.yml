@@ -1,44 +1,47 @@
-name: Assemble Medemblik ROM
+name: Assemble ROM from zlib_b64
+
 on:
   push:
     paths:
       - 'dist/zlib_b64/**'
+      - 'dist/SHA256.txt'
       - '.github/workflows/assemble-rom.yml'
   workflow_dispatch:
+
 jobs:
   assemble:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Inflate ROM from zlib_b64 parts
+
+      - name: Assemble medemblik.rom from zlib_b64 chunks
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          import pathlib, zlib, base64, hashlib
-          parts = sorted(pathlib.Path('dist/zlib_b64').glob('*.txt'))
-          assert len(parts) == 6, parts
-          b64 = ''.join(p.read_text().strip() for p in parts)
-          # Fix known single-char MCP transcription errors in parts 02/03
-          b64 = b64.replace('AcWIh3rCj32PnQf', 'AcWIh3rCJ32PnQf', 1)
-          b64 = b64.replace('Sd66rc3KaRpqPTTc', 'Sd66rc3KaRqdPTTc', 1)
-          raw = zlib.decompress(base64.b64decode(b64))
-          assert len(raw) == 524288, len(raw)
-          expect = '0271b2649d10853604f1c868366e894bbe987b123dc5858f3b0878c561e6a12d'
-          got = hashlib.sha256(raw).hexdigest()
-          assert got == expect, got
-          pathlib.Path('dist/medemblik.rom').write_bytes(raw)
-          print('parts', len(parts), 'wrote', len(raw), 'sha256', got)
+          python3 << 'PY'
+          import base64, zlib, hashlib
+          from pathlib import Path
+
+          chunk_dir = Path('dist/zlib_b64')
+          chunks = sorted(chunk_dir.glob('*.txt'))
+          if not chunks:
+              raise SystemExit('no zlib_b64 chunks found')
+          b64 = ''.join(p.read_text().strip() for p in chunks)
+          # Accept standard base64 or base64url (-/_ form) used for MCP-safe pushes
+          b64 = b64.replace('-', '+').replace('_', '/')
+          rom = zlib.decompress(base64.b64decode(b64, validate=True))
+          out = Path('dist/medemblik.rom')
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_bytes(rom)
+          digest = hashlib.sha256(rom).hexdigest()
+          expected = Path('dist/SHA256.txt').read_text().strip().split()[0]
+          print(f'chunks={len(chunks)} size={len(rom)} sha256={digest}')
+          if digest != expected:
+              raise SystemExit(f'SHA256 mismatch: got {digest}, expected {expected}')
+          print('SHA256 OK')
           PY
-      - name: Commit ROM if changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dist/medemblik.rom
-          if git diff --staged --quiet; then
-            echo "No ROM changes"
-          else
-            git commit -m "Add Screen 7 ASCII16 Medemblik ROM (512KB)"
-            git push
-          fi
+
+      - name: Upload ROM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: medemblik-rom
+          path: dist/medemblik.rom
