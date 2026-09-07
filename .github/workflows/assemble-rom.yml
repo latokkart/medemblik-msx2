@@ -26,6 +26,8 @@ jobs:
           if not chunks:
               raise SystemExit('no zlib_b64 chunks found')
           b64 = ''.join(p.read_text().strip() for p in chunks)
+          # Accept standard base64 or base64url (-/_ form) used for MCP-safe pushes
+          b64 = b64.replace('-', '+').replace('_', '/')
           rom = zlib.decompress(base64.b64decode(b64, validate=True))
           out = Path('dist/medemblik.rom')
           out.parent.mkdir(parents=True, exist_ok=True)
