@@ -1,0 +1,67 @@
+{
+  "spawn": [
+    1046,
+    872
+  ],
+  "world": [
+    1584,
+    1792
+  ],
+  "view": [
+    256,
+    212
+  ],
+  "bpl": 792,
+  "bpl_stor": 1024,
+  "bbox": [
+    52.764,
+    52.778,
+    5.098,
+    5.118
+  ],
+  "bbox_m_approx": [
+    1558.5,
+    1347.0
+  ],
+  "deg_per_px": [
+    7.8125e-06,
+    1.26953125e-05
+  ],
+  "n_water_poly": 18,
+  "n_canal_seg": 253,
+  "n_haven_seg": 3,
+  "n_bld": 3744,
+  "n_road_seg": 3186,
+  "n_skip_huge": 3,
+  "n_ijsselmeer": 1,
+  "synth_havens": {
+    "Pekelharinghaven": 1,
+    "Oosterhaven": 1,
+    "Oude Haven": 1
+  },
+  "n_labels": 71,
+  "n_label_skip_dense": 8,
+  "label_font": "5x7",
+  "labels_sample": [
+    "Vlietsingel",
+    "Oosterdijk",
+    "Randweg",
+    "Schuitevoerd",
+    "Overtoom",
+    "Admiraliteit",
+    "Compagnie",
+    "Keern",
+    "Almereweg",
+    "Hoogesteeg",
+    "OudeHaven",
+    "Dam",
+    "Overleek",
+    "Pekelharingh",
+    "Nijverheids",
+    "Vooreiland",
+    "Breek",
+    "Landswerf",
+    "Oudevaartsga",
+    "Westereiland"
+  ]
+}
