@@ -4,6 +4,16 @@ Top-down **Screen 5** street map of **Medemblik** (Netherlands) for **MSX2+ / tu
 
 Street layout is derived from [OpenStreetMap](https://www.openstreetmap.org/copyright) data (highways, water, buildings) around Radboud / Oude Haven, rasterized to a large Scr5 world bitmap packed into an ASCII16 mapper ROM (~2 MB).
 
+## Download
+
+Latest playable ROM (2 MB ASCII16):
+
+- **[medemblik.rom](https://github.com/latokkart/medemblik-msx2/releases/download/scr5-stable/medemblik.rom)** — release `scr5-stable`
+- SHA256: `2b5692531aaf8f6d530ba24c253e2ef8cda4e01aff4c25c0f40b0030c28af9a1`
+- Release page: https://github.com/latokkart/medemblik-msx2/releases/tag/scr5-stable
+
+(Sources assemble the same binary via `.github/workflows/assemble-rom.yml` from `dist/zlib_b64/`.)
+
 ## Play
 
 - ROM: `dist/medemblik.rom` (2 MB ASCII16 cartridge; assembled by CI from `dist/zlib_b64/` — see below)
